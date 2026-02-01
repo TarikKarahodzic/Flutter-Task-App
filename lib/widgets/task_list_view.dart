@@ -43,22 +43,37 @@ class _TaskListViewState extends State<TaskListView> {
         itemCount: tasks.length,
         itemBuilder: (context, index) {
           final task = tasks[index];
-          return ListTile(
-            title: Text(task.title),
-            leading: task.status == TaskStatus.completed
-                ? const Icon(Icons.check_box)
-                : const Icon(Icons.check_box_outline_blank),
-            onTap: () {
+          return Dismissible(
+            background: Container(
+              color: Colors.red,
+              padding: const EdgeInsets.only(right: 20),
+              alignment: Alignment.centerRight,
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            key: ValueKey(task.title),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) {
               setState(() {
-                final isCompleted = task.status == TaskStatus.completed;
-                tasks[index] = Task(
-                  title: task.title,
-                  status: isCompleted
-                      ? TaskStatus.pending
-                      : TaskStatus.completed,
-                );
+                tasks.removeAt(index);
               });
             },
+            child: ListTile(
+              title: Text(task.title),
+              leading: task.status == TaskStatus.completed
+                  ? const Icon(Icons.check_box)
+                  : const Icon(Icons.check_box_outline_blank),
+              onTap: () {
+                setState(() {
+                  final isCompleted = task.status == TaskStatus.completed;
+                  tasks[index] = Task(
+                    title: task.title,
+                    status: isCompleted
+                        ? TaskStatus.pending
+                        : TaskStatus.completed,
+                  );
+                });
+              },
+            ),
           );
         },
       ),
