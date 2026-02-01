@@ -3,6 +3,7 @@ import 'package:flutter_test1/models/task.dart';
 import 'package:flutter_test1/screens/add_task_page.dart';
 import 'package:flutter_test1/screens/edit_task_page.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -12,11 +13,7 @@ class TaskListView extends StatefulWidget {
 }
 
 class _TaskListViewState extends State<TaskListView> {
-  final List<Task> tasks = [
-    Task(title: 'Task 1', status: TaskStatus.pending),
-    Task(title: 'Task 2', status: TaskStatus.completed),
-    Task(title: 'Task 3', status: TaskStatus.pending),
-  ];
+  final List<Task> tasks = [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +32,9 @@ class _TaskListViewState extends State<TaskListView> {
           if (title.isEmpty) return;
 
           setState(() {
-            tasks.add(Task(title: title, status: TaskStatus.pending));
+            tasks.add(
+              Task(id: Uuid().v4(), title: title, status: TaskStatus.pending),
+            );
           });
         },
         child: const Icon(Icons.add),
@@ -48,7 +47,7 @@ class _TaskListViewState extends State<TaskListView> {
               itemBuilder: (context, index) {
                 final task = tasks[index];
                 return Slidable(
-                  key: ValueKey('$index-${task.title}'),
+                  key: ValueKey(task.id),
 
                   endActionPane: ActionPane(
                     motion: const DrawerMotion(),
@@ -119,6 +118,7 @@ class _TaskListViewState extends State<TaskListView> {
                       setState(() {
                         final isCompleted = task.status == TaskStatus.completed;
                         tasks[index] = Task(
+                          id: task.id,
                           title: task.title,
                           status: isCompleted
                               ? TaskStatus.pending

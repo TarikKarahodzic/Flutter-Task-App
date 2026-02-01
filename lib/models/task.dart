@@ -1,8 +1,11 @@
+import 'package:uuid/uuid.dart';
+
 enum TaskStatus { pending, completed }
 
-class Task {
+class Task { 
+  final String id;
   final String title;
   final TaskStatus status;
 
-  const Task({required this.title, required this.status});
+  Task({required this.id, required this.title, required this.status});
 }
