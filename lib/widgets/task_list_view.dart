@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test1/models/task.dart';
 import 'package:flutter_test1/screens/add_task_page.dart';
+import 'package:flutter_test1/screens/edit_task_page.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
@@ -45,40 +47,69 @@ class _TaskListViewState extends State<TaskListView> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 final task = tasks[index];
-                return Dismissible(
-                  background: Container(
-                    color: Colors.red,
-                    padding: const EdgeInsets.only(right: 20),
-                    alignment: Alignment.centerRight,
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  key: ValueKey(task.title),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (_) {
-                    final removedTask = task;
-                    final removedIndex = index;
+                return Slidable(
+                  key: ValueKey('$index-${task.title}'),
 
-                    setState(() {
-                      tasks.removeAt(index);
-                    });
-                    ScaffoldMessenger.of(context).clearSnackBars();
+                  endActionPane: ActionPane(
+                    motion: const DrawerMotion(),
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        duration: const Duration(seconds: 3),
-                        content: Text('Deleted "${removedTask.title}"'),
-                        action: SnackBarAction(
-                          label: 'UNDO',
-                          onPressed: () {
-                            setState(() {
-                              tasks.insert(removedIndex, removedTask);
-                            });
-                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          },
-                        ),
+                    children: [
+                      SlidableAction(
+                        // An action can be bigger than the others.
+                        flex: 1,
+                        onPressed: (ctx) async {
+                          final Task? edited = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => EditTaskPage(task: task),
+                            ),
+                          );
+
+                          if (edited != null) {
+                            setState(() => tasks[index] = edited);
+                          }
+                        },
+                        backgroundColor: Color(0xFF7BC043),
+                        foregroundColor: Colors.white,
+                        icon: Icons.edit,
+                        label: 'Edit',
                       ),
-                    );
-                  },
+                      SlidableAction(
+                        flex: 1,
+                        onPressed: (ctx) {
+                          final removedTask = task;
+                          final removedIndex = index;
+
+                          setState(() {
+                            tasks.removeAt(index);
+                          });
+                          ScaffoldMessenger.of(context).clearSnackBars();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: const Duration(seconds: 3),
+                              content: Text('Deleted "${removedTask.title}"'),
+                              action: SnackBarAction(
+                                label: 'UNDO',
+                                onPressed: () {
+                                  setState(() {
+                                    tasks.insert(removedIndex, removedTask);
+                                  });
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).hideCurrentSnackBar();
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                        backgroundColor: Color(0xFF0392CF),
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      ),
+                    ],
+                  ),
                   child: ListTile(
                     title: Text(task.title),
                     leading: task.status == TaskStatus.completed
