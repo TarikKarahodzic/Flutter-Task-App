@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 enum TaskStatus { pending, completed }
 
 class Task { 
