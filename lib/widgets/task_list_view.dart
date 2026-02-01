@@ -21,11 +21,20 @@ class _TaskListViewState extends State<TaskListView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Task List')),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const AddTaskPage()),
           );
+
+          if (result == null) return;
+
+          final title = (result as String).trim();
+          if (title.isEmpty) return;
+
+          setState(() {
+            tasks.add(Task(title: title, status: TaskStatus.pending));
+          });
         },
         child: const Icon(Icons.add),
       ),

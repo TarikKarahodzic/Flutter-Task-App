@@ -23,9 +23,19 @@ class _AddTaskPageState extends State<AddTaskPage> {
       body: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.all(6),
-        child: TextFormField(
-          controller: _controller,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, _controller.text);
+              },
+              child: const Text('Add Task'),
+            ),
+          ],
         ),
       ),
     );
